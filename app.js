@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Photo = require('./models/Photo');
 const fileUpload = require('express-fileupload');
 const fs = require('fs')  // for creating a folder
+const methodOverride = require('method-override');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.static('public')); // We keep static files in the public folder
 app.use(express.urlencoded({ extended: true })); // for req.body
 app.use(express.json()); // for req.body
 app.use(fileUpload());
+app.use(methodOverride('_method'));
 
 app.get('/', async (req, res) => {
   const photos = await Photo.find({});
@@ -55,6 +57,19 @@ app.post('/photos', async (req, res) => {
   });
 
 });
+
+app.get('/photos/edit/:id', async (req, res) => {
+  const photo = await Photo.findOne({_id : req.params.id})
+  res.render('edit', { photo: photo })
+});
+
+app.put('/photos/:id', async(req, res) => {
+  const photo = await Photo.findOne({_id : req.params.id})
+  photo.title = req.body.title
+  photo.description = req.body.description
+  photo.save()
+  res.redirect(`/photos/${req.params.id}`)
+})
 
 const port = 3000;
 
