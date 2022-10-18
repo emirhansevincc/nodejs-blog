@@ -5,6 +5,7 @@ const Photo = require('./models/Photo');
 const fileUpload = require('express-fileupload');
 const fs = require('fs')  // for creating a folder
 const methodOverride = require('method-override');
+const { findByIdAndRemove } = require('./models/Photo');
 
 const app = express();
 
@@ -21,7 +22,9 @@ app.use(express.static('public')); // We keep static files in the public folder
 app.use(express.urlencoded({ extended: true })); // for req.body
 app.use(express.json()); // for req.body
 app.use(fileUpload());
-app.use(methodOverride('_method'));
+app.use(methodOverride('_method', {
+  methods: ['POST', 'GET']
+}));
 
 app.get('/', async (req, res) => {
   const photos = await Photo.find({});
@@ -70,6 +73,14 @@ app.put('/photos/:id', async(req, res) => {
   photo.save()
   res.redirect(`/photos/${req.params.id}`)
 })
+
+app.delete('/photos/:id', async (req, res) => {
+  const photo = await Photo.findOne({_id: req.params.id})
+  let deletedImage = __dirname + '/public/' + photo.image;
+  fs.unlinkSync(deletedImage) // deletes from local
+  await Photo.findByIdAndRemove(req.params.id) // deletes from database
+  res.redirect('/')
+});
 
 const port = 3000;
 
