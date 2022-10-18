@@ -8,7 +8,8 @@ app.set("view engine", "ejs");
 
 // Middlewares
 app.use(express.static('public')) // We keep static files in the public folder
-
+app.use(express.urlencoded({extended:true}))    // for req.body
+app.use(express.json())                         // for req.body
 
 
 app.get("/",(req, res) => {
@@ -23,7 +24,12 @@ app.get("/add",(req, res) => {
     res.render("add.ejs")
 })
 
-
+app.post('/photos', (req, res) => {
+    console.log(
+        req.body
+    );
+    res.redirect('/')
+})
 
 const port = 3000
 
