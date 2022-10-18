@@ -31,6 +31,11 @@ app.get('/add', (req, res) => {
   res.render('add.ejs');
 });
 
+app.get('/photos/:id', async (req, res) => {
+    const photo = await Photo.findById(req.params.id)
+    res.render('photo', { photo: photo })
+});
+
 app.post('/photos', async (req, res) => {
   await Photo.create(req.body);
   res.redirect('/');
