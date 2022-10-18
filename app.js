@@ -1,7 +1,14 @@
 const express = require("express")
 const ejs = require("ejs")
+const mongoose = require('mongoose');
+const Photo = require('./models/Photo')
 
 const app = express()
+
+mongoose.connect('mongodb://localhost/pcat-test-db', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 //Template Engine
 app.set("view engine", "ejs");
@@ -24,10 +31,8 @@ app.get("/add",(req, res) => {
     res.render("add.ejs")
 })
 
-app.post('/photos', (req, res) => {
-    console.log(
-        req.body
-    );
+app.post('/photos', async(req, res) => {
+    await Photo.create(req.body)
     res.redirect('/')
 })
 
